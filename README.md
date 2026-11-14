@@ -83,6 +83,6 @@ The plugin ships the official FluidSynth 2.6.2 release binaries, unmodified apar
 
 The plugin's own code is MIT. FluidSynth and libsndfile are under the GNU Lesser General Public License 2.1 or later, and the other bundled libraries are under Apache-2.0 and BSD-3-Clause. `LICENSE` holds every text.
 
-FluidSynth is linked dynamically on both platforms, as a shared library on Android and as a dynamic framework on iOS. Its source is at https://github.com/FluidSynth/fluidsynth, tag `v2.6.2`. An app that ships this plugin should name FluidSynth and its licence in its own licence notices. On Flutter, `LicenseRegistry` is one place to do that.
+FluidSynth is linked dynamically on both platforms, as a shared library on Android and as a dynamic framework on iOS. Its source is at https://github.com/FluidSynth/fluidsynth, tag `v2.6.2`. An app that ships this plugin should name FluidSynth and its licence in its own licence notices. A Flutter app does that without any code of its own: `LICENSE` is in the format Flutter's tool reads, parts split by a line of 80 hyphens, each opening with the names it covers, so the app's licence page lists `khuur_synth`, `fluidsynth`, `libsndfile`, `oboe`, `libogg`, `libvorbis`, `flac` and `opus`, each with its licence. `test/license_test.dart` reads the file the way the tool does.
 
 This is not legal advice.
