@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -35,6 +36,21 @@ void main() {
     await synth.stop(ringOut: true);
     expect(watch.elapsed, lessThan(const Duration(seconds: 5)));
     expect(await synth.render(4410), hasLength(8820));
+    await synth.close();
+  });
+
+  test('start, stop, start called at once leaves the device playing', () async {
+    final synth = await Synth.open();
+    synth.select(channel: 0, font: await synth.load(piano), program: 0);
+    unawaited(synth.start());
+    unawaited(synth.stop());
+    await synth.start();
+    synth.noteOn(channel: 0, key: 64);
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    expect(() => synth.render(1), throwsStateError);
+    final watch = Stopwatch()..start();
+    await synth.stop(ringOut: true);
+    expect(watch.elapsed, lessThan(const Duration(seconds: 5)));
     await synth.close();
   });
 

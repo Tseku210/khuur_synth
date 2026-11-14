@@ -87,8 +87,14 @@ final class Synth {
   final _fonts = <int, LoadedSoundFont>{};
   final _jobs = Queue<_Job>();
   var _pumping = false;
+
+  /// What the calls made so far ask of the device output. A call changes it
+  /// at once, and queues the step that brings the device there.
   _Audio _audio = const _Stopped();
-  StreamSubscription<void>? _resets;
+
+  /// The device output as the steps run so far have left it. It holds the
+  /// start it is open for, or null while it is closed.
+  ({_Started started, StreamSubscription<void> resets})? _output;
   Future<void>? _closing;
   Reverb? _reverb;
   bool _chorus;
@@ -230,36 +236,43 @@ final class Synth {
   ///
   /// On iOS it sets the audio session as the synth's [AudioSessionPolicy]
   /// says, and opens the output again after an interruption ends or the media
-  /// services reset. A start while ringing out keeps the output open.
+  /// services reset. A start while ringing out keeps the output open, and a
+  /// start after a stop opens it again once that stop has closed it.
   Future<void> start() {
     _checkOpen();
     switch (_audio) {
-      case _Started():
-        return Future.value();
-      case _Starting(:final opened):
+      case _Started(:final opened):
         return opened;
       case final _Ringing ringing:
         ringing.finish();
-        _audio = const _Started();
-        return Future.value();
+        _audio = ringing.started;
+        return ringing.started.opened;
       case _Stopped():
-        final opened = _op(_open);
-        _audio = _Starting(opened);
-        return opened;
+        final started = _Started();
+        _audio = started;
+        return started.opened = _op(() => _open(started));
     }
   }
 
-  Future<void> _open() async {
+  Future<void> _open(_Started started) async {
     if (_closing != null) return;
     try {
       await _openOutput();
     } catch (_) {
-      _audio = const _Stopped();
+      _lost(started);
       rethrow;
     }
-    _audio = const _Started();
-    _resets = _session.resets.listen((_) => _reopen());
+    _output = (started: started, resets: _session.resets.listen((_) => _reopen(started)));
     _emit(const Started());
+  }
+
+  /// The output [started] asked for is closed and will not open. A stop or a
+  /// start made since then stands.
+  void _lost(_Started started) {
+    final audio = _audio;
+    if (!identical(audio is _Ringing ? audio.started : audio, started)) return;
+    if (audio is _Ringing) audio.finish();
+    _audio = const _Stopped();
   }
 
   /// FluidSynth's driver sets the iOS session itself, to `.playback` mixed
@@ -270,16 +283,19 @@ final class Synth {
     await _session.activate(_policy);
   }
 
-  void _reopen() {
+  void _reopen(_Started started) {
     unawaited(
       _op(() async {
-        if (_audio is! _Started && _audio is! _Ringing) return;
-        await _engine.closeAudio();
-        await _openOutput();
-      }).catchError((Object _) {
-        if (_audio case final _Ringing ringing) ringing.finish();
-        _audio = const _Stopped();
-        _resets?.cancel();
+        final output = _output;
+        if (output == null || !identical(output.started, started)) return;
+        try {
+          await _engine.closeAudio();
+          await _openOutput();
+        } catch (_) {
+          _output = null;
+          unawaited(output.resets.cancel());
+          _lost(started);
+        }
       }),
     );
   }
@@ -291,10 +307,8 @@ final class Synth {
     switch (_audio) {
       case _Stopped():
         return Future.value();
-      case _Starting(:final opened):
-        return opened.then((_) => stop(ringOut: ringOut), onError: (Object _) {});
-      case _Started():
-        return ringOut ? _ringOut() : _close(ringOut: false);
+      case final _Started started:
+        return ringOut ? _ringOut(started) : _close(ringOut: false);
       case final _Ringing ringing:
         if (ringOut) return ringing.closed;
         final closed = _close(ringOut: false);
@@ -303,7 +317,7 @@ final class Synth {
     }
   }
 
-  Future<void> _ringOut() {
+  Future<void> _ringOut(_Started started) {
     _command(_engine.allNotesOff);
     var ticks = 0;
     var quiet = 0;
@@ -314,17 +328,20 @@ final class Synth {
       if (quiet < _ringQuietTicks && ticks < _ringMaxTicks) return;
       ringing.finish(_close(ringOut: true));
     });
-    ringing = _Ringing(timer);
+    ringing = _Ringing(started, timer);
     _audio = ringing;
     return ringing.closed;
   }
 
   Future<void> _close({required bool ringOut}) {
     _audio = const _Stopped();
-    _resets?.cancel();
-    _resets = null;
     if (!ringOut) _command(_engine.allSoundsOff);
     return _op(() async {
+      final output = _output;
+      // The start this stop follows failed, so nothing is open.
+      if (output == null) return;
+      _output = null;
+      unawaited(output.resets.cancel());
       await _engine.closeAudio();
       _emit(Stopped(ringOut: ringOut));
     });
@@ -350,9 +367,9 @@ final class Synth {
   Future<void> _shutDown() {
     if (_audio case final _Ringing ringing) ringing.finish();
     _audio = const _Stopped();
-    _resets?.cancel();
-    _resets = null;
     return _op(() async {
+      unawaited(_output?.resets.cancel());
+      _output = null;
       await _engine.close();
       _emit(const Closed());
     });
@@ -470,18 +487,17 @@ final class _Stopped extends _Audio {
   const _Stopped();
 }
 
-final class _Starting extends _Audio {
-  const _Starting(this.opened);
-
-  final Future<void> opened;
-}
-
+/// One start, from the call until a stop or a failed open ends it. The output
+/// may not be open yet, and [opened] is the step that opens it.
 final class _Started extends _Audio {
-  const _Started();
+  late final Future<void> opened;
 }
 
+/// A stop with ring-out that waits for the notes of [started] to fade.
 final class _Ringing extends _Audio {
-  _Ringing(this._timer);
+  _Ringing(this.started, this._timer);
+
+  final _Started started;
 
   final Timer _timer;
   final _closed = Completer<void>();
