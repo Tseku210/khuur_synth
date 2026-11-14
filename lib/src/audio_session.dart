@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'synth_exception.dart';
@@ -13,6 +12,21 @@ enum AudioSessionPolicy {
 
   /// `.playback` mixed with other apps' audio.
   playbackMixing,
+
+  /// `.playAndRecord`, to play while the app records, as when it listens to
+  /// the microphone.
+  ///
+  /// The synth keeps the `.playAndRecord` session the recording set, with
+  /// its mode, options and IO buffer duration, so a recording in
+  /// `.measurement` mode stays in it. Until a recording sets one, the synth
+  /// sets `.playAndRecord` itself, in mode `.default`, out of the speaker and
+  /// to Bluetooth headphones through A2DP.
+  ///
+  /// FluidSynth's driver opens in its low-latency mode, the one in which it
+  /// asks for `.playAndRecord` rather than `.playback`, so the input stays
+  /// open. The driver still sets its own mode, options and IO buffer as it
+  /// opens, and the synth sets back the recording's once it has.
+  playAndRecord,
 
   /// The plugin never touches the session, and the app sets it. FluidSynth's
   /// driver still sets `.playback` mixed with others as it opens, so an app
@@ -40,7 +54,7 @@ final class PlatformAudioSession implements AudioSession {
 
   @override
   Future<void> activate(AudioSessionPolicy policy) async {
-    if (!Platform.isIOS || policy == AudioSessionPolicy.manual) return;
+    if (defaultTargetPlatform != TargetPlatform.iOS || policy == AudioSessionPolicy.manual) return;
     try {
       await _methods.invokeMethod<void>('activate', policy.name);
     } on PlatformException catch (e) {
@@ -49,7 +63,7 @@ final class PlatformAudioSession implements AudioSession {
   }
 
   @override
-  late final Stream<void> resets = Platform.isIOS
+  late final Stream<void> resets = defaultTargetPlatform == TargetPlatform.iOS
       ? _events.receiveBroadcastStream().map((_) {})
       : const Stream<void>.empty();
 }

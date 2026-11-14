@@ -35,6 +35,10 @@ final class Synth {
   /// A synth with FluidSynth's own sound: its reverb, its chorus and a gain
   /// of 0.2. Throws [SynthUnavailable] where FluidSynth cannot run, which is
   /// anywhere but iOS and Android.
+  ///
+  /// [session] is how [start] sets the iOS audio session. Pass
+  /// [AudioSessionPolicy.playAndRecord] for a synth that plays while the app
+  /// records.
   static Future<Synth> open({
     Reverb? reverb = const Reverb(),
     bool chorus = true,
@@ -44,7 +48,7 @@ final class Synth {
     _checkReverb(reverb);
     _checkGain(gain);
     return Synth._(
-      FluidEngine.open(channels: channelCount),
+      FluidEngine.open(channels: channelCount, keepsInput: session == AudioSessionPolicy.playAndRecord),
       PlatformAudioSession.instance,
       session,
       null,
@@ -275,8 +279,10 @@ final class Synth {
     _audio = const _Stopped();
   }
 
-  /// FluidSynth's driver sets the iOS session itself, to `.playback` mixed
-  /// with others, so the policy is set again once the driver is open.
+  /// FluidSynth's driver sets the iOS session itself as it opens, to
+  /// `.playback` mixed with others, or to `.playAndRecord` with its own mode
+  /// and options for [AudioSessionPolicy.playAndRecord], so the policy is set
+  /// again once the driver is open.
   Future<void> _openOutput() async {
     await _session.activate(_policy);
     await _engine.openAudio();

@@ -17,6 +17,7 @@ functions:
     - new_fluid_settings
     - delete_fluid_settings
     - fluid_settings_setint
+    - fluid_settings_setstr
     - new_fluid_synth
     - delete_fluid_synth
     - new_fluid_audio_driver
