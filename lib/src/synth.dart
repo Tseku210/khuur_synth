@@ -30,6 +30,7 @@ final class Synth {
       ..setGain(_gain);
   }
 
+  /// How many MIDI channels a synth has, numbered from 0.
   static const channelCount = 256;
 
   /// A synth with FluidSynth's own sound: its reverb, its chorus and a gain
@@ -154,8 +155,11 @@ final class Synth {
     });
   }
 
-  /// Strikes [key]. [cents] detunes this note alone, from -1200 to 1200, and
-  /// leaves the notes already sounding where they are.
+  /// Strikes [key], from 0 to 127, at [velocity], from 1 to 127.
+  ///
+  /// [cents] detunes this note alone, from -1200 to 1200, and leaves the notes
+  /// already sounding where they are. A channel that no [select] has set plays
+  /// nothing.
   void noteOn({required int channel, required int key, int velocity = 100, double cents = 0}) {
     _checkOpen();
     _checkChannel(channel);
@@ -171,6 +175,7 @@ final class Synth {
     });
   }
 
+  /// Releases [key], which then fades as its release says.
   void noteOff({required int channel, required int key}) {
     _checkOpen();
     _checkChannel(channel);
@@ -212,6 +217,7 @@ final class Synth {
     });
   }
 
+  /// Whether the chorus is on.
   bool get chorus => _chorus;
 
   set chorus(bool value) {
@@ -223,7 +229,8 @@ final class Synth {
     });
   }
 
-  /// From 0 to 10. FluidSynth's default is 0.2.
+  /// How loud the synth plays, as a linear factor on its output, from 0 to
+  /// 10. FluidSynth's default is 0.2. Much above 1, loud chords can clip.
   double get gain => _gain;
 
   set gain(double value) {
@@ -306,8 +313,11 @@ final class Synth {
     );
   }
 
-  /// Closes the device output. With [ringOut] the notes are released first,
-  /// and the output closes once the last one has faded, or after 10 s.
+  /// Closes the device output.
+  ///
+  /// Without [ringOut] every note stops at once. With [ringOut] the notes are
+  /// released first, and the output closes once no voice has sounded for
+  /// 100 ms, or after 10 s. A reverb tail longer than that is cut.
   Future<void> stop({bool ringOut = false}) {
     _checkOpen();
     switch (_audio) {
@@ -354,7 +364,11 @@ final class Synth {
   }
 
   /// Renders [frames] of interleaved stereo at 44.1 kHz without the device,
-  /// for checks and bounces. Only while stopped.
+  /// for checks and bounces, up to 600 s at a time.
+  ///
+  /// The render moves the synth on in time, so notes struck before it sound in
+  /// it, and are that far along afterwards. Throws a [StateError] unless the
+  /// synth is stopped.
   Future<Float32List> render(int frames) {
     _checkOpen();
     RangeError.checkValueInInterval(frames, 1, 44100 * 600, 'frames');
@@ -453,7 +467,8 @@ final class Synth {
   }
 }
 
-/// A synth over [engine], for this package's tests.
+/// A synth over [engine]. `Synth.silent` and this package's tests make
+/// theirs with it.
 Synth synthOver(
   Engine engine, {
   AudioSession session = const NoAudioSession(),
@@ -474,6 +489,8 @@ final class LoadedSoundFont {
 
   final Synth _owner;
   final int _id;
+
+  /// Where the SoundFont was loaded from.
   final SoundFont source;
 
   /// Every preset in the file, in the order FluidSynth lists them.

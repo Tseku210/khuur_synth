@@ -12,11 +12,13 @@ abstract interface class Engine {
   /// Throws `SoundFontLoadFailed`.
   Future<({int id, List<Preset> presets})> load(SoundFont source);
 
+  /// Frees the SoundFont loaded as [id].
   Future<void> unload(int id);
 
   /// Throws `AudioOutputFailed`.
   Future<void> openAudio();
 
+  /// Closes the device output.
   Future<void> closeAudio();
 
   /// Interleaved stereo, `frames * 2` samples.
@@ -25,33 +27,46 @@ abstract interface class Engine {
   /// Closes the audio output if it is open and frees the synth.
   Future<void> close();
 
+  /// Sets [channel] to play [program] of [bank] in the SoundFont [id].
   void select(int channel, int id, int bank, int program);
 
+  /// Sets [channel] to play nothing.
   void unset(int channel);
 
+  /// Strikes [key] on [channel].
   void noteOn(int channel, int key, int velocity);
 
+  /// Releases [key] on [channel].
   void noteOff(int channel, int key);
 
+  /// Releases every note.
   void allNotesOff();
 
+  /// Silences every note at once.
   void allSoundsOff();
 
+  /// Tunes [key] on [channel] [cents] away from equal temperament.
   void tuneKey(int channel, int key, double cents);
 
+  /// Makes [channel] play through its tuning.
   void activateTuning(int channel);
 
+  /// Sets the reverb, or turns it off for null.
   void setReverb(Reverb? reverb);
 
+  /// Turns the chorus on or off.
   void setChorus(bool on);
 
+  /// Sets the gain.
   void setGain(double gain);
 
+  /// How many voices sound now, counting those still fading.
   int get activeVoices;
 }
 
 /// An engine that makes no sound, behind `Synth.silent`.
 final class NoEngine implements Engine {
+  /// An engine whose loads find the presets [_presets] gives.
   NoEngine(this._presets);
 
   final List<Preset> Function(SoundFont source) _presets;

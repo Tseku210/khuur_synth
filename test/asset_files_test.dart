@@ -39,6 +39,14 @@ void main() {
     expect(File('$first.part').existsSync(), isFalse);
   });
 
+  test('a copy the OS deleted is made again', () async {
+    final path = await files.pathOf('a.sf2');
+    File(path).deleteSync();
+    expect(await files.pathOf('a.sf2'), path);
+    expect(File(path).existsSync(), isTrue);
+    expect(bundle.loads, 2);
+  });
+
   test('a copy that fails is tried again', () async {
     bundle.fail = true;
     await expectLater(files.pathOf('a.sf2'), throwsStateError);

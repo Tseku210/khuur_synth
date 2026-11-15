@@ -1,6 +1,13 @@
 ## 0.1.0
 
-- First release. `Synth` plays SF2 files on iOS and Android through FluidSynth 2.6.2, with per-note cents, reverb, chorus, gain, device output with ring-out, offline rendering, and `Synth.silent` for tests.
-- `start` and `stop` take effect in the order they were called. A `stop` called while a `start` was still opening the output ran after it outside the queue, so `start`, `stop`, `start` left the output closed.
-- `AudioSessionPolicy.playAndRecord` plays while the app records. The iOS driver opens in its low-latency mode so the input stays open, and the plugin keeps the recording's `.playAndRecord` mode, options and IO buffer duration.
+First release.
+
+- `Synth` plays SF2 SoundFonts on iOS and Android through FluidSynth 2.6.2, over `dart:ffi`, with 256 MIDI channels.
+- SoundFonts load from assets (`AssetSoundFont`) or from files (`FileSoundFont`), and list their presets.
+- `noteOn` takes `cents`, which detunes one note without moving the notes already sounding.
+- Reverb, chorus and gain, each settable at any time.
+- `start` and `stop` open and close the device output, and `stop(ringOut: true)` lets the notes fade first. Every call takes effect in the order it was made.
+- `render` renders samples without the device.
+- `AudioSessionPolicy` sets the iOS audio session as `playback`, `playbackMixing`, `playAndRecord` or `manual`. `playAndRecord` plays while the app records.
+- `Synth.silent` and `package:khuur_synth/testing.dart` test code that plays music on a host machine.
 - `LICENSE` is in the format Flutter's tool reads, so an app's licence page lists khuur_synth, FluidSynth and each library it bundles by name.

@@ -4,6 +4,10 @@ version: 0.1.0
 repository: https://github.com/Tseku210/khuur_synth
 issue_tracker: https://github.com/Tseku210/khuur_synth/issues
 
+platforms:
+  android:
+  ios:
+
 topics:
   - audio
   - midi
