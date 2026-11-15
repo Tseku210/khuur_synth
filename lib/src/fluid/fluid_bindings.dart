@@ -39,6 +39,23 @@ class FluidSynthBindings {
   late final _delete_fluid_settings = _delete_fluid_settingsPtr
       .asFunction<void Function(ffi.Pointer<fluid_hashtable_t>)>();
 
+  int fluid_settings_setstr(
+    ffi.Pointer<fluid_hashtable_t> settings,
+    ffi.Pointer<ffi.Char> name,
+    ffi.Pointer<ffi.Char> str,
+  ) {
+    return _fluid_settings_setstr(settings, name, str);
+  }
+
+  late final _fluid_settings_setstrPtr =
+      _lookup<
+        ffi.NativeFunction<
+          ffi.Int Function(ffi.Pointer<fluid_hashtable_t>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)
+        >
+      >('fluid_settings_setstr');
+  late final _fluid_settings_setstr = _fluid_settings_setstrPtr
+      .asFunction<int Function(ffi.Pointer<fluid_hashtable_t>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
+
   int fluid_settings_setint(ffi.Pointer<fluid_hashtable_t> settings, ffi.Pointer<ffi.Char> name, int val) {
     return _fluid_settings_setint(settings, name, val);
   }

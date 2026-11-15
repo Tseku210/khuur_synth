@@ -32,13 +32,27 @@ final class FluidEngine implements Engine {
   FluidEngine._(this._settings, this._synth);
 
   /// Throws `SynthUnavailable`.
-  factory FluidEngine.open({required int channels}) {
+  ///
+  /// With [keepsInput] the iOS driver opens in its low-latency mode, in which
+  /// it sets the session to `.playAndRecord` rather than `.playback`, so a
+  /// recording keeps its input.
+  factory FluidEngine.open({required int channels, bool keepsInput = false}) {
     final settings = _fluid.new_fluid_settings();
     if (settings == nullptr) throw const SynthUnavailable('FluidSynth would not create its settings.');
-    using(
-      (arena) =>
-          _fluid.fluid_settings_setint(settings, 'synth.midi-channels'.toNativeUtf8(allocator: arena).cast(), channels),
-    );
+    final set = using((arena) {
+      _fluid.fluid_settings_setint(settings, 'synth.midi-channels'.toNativeUtf8(allocator: arena).cast(), channels);
+      if (!keepsInput || !Platform.isIOS) return true;
+      return _fluid.fluid_settings_setstr(
+            settings,
+            'audio.coreaudio.performance-mode'.toNativeUtf8(allocator: arena).cast(),
+            'LowLatency'.toNativeUtf8(allocator: arena).cast(),
+          ) ==
+          0;
+    });
+    if (!set) {
+      _fluid.delete_fluid_settings(settings);
+      throw const SynthUnavailable('FluidSynth has no low-latency driver to play beside a recording.');
+    }
     final synth = _fluid.new_fluid_synth(settings);
     if (synth == nullptr) {
       _fluid.delete_fluid_settings(settings);

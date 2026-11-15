@@ -59,9 +59,10 @@ Each synth owns its own FluidSynth synthesizer and its own output. Two synths th
 ### iOS
 
 - Only SF2 files load. The official FluidSynth framework is built without SF3 support.
-- `start` sets the audio session as `session` says. `AudioSessionPolicy.playback`, the default, is `.playback` without mixing, so other apps' audio stops and the ring switch does not mute the synth. `playbackMixing` mixes with other apps. `manual` leaves the session to the app.
-- FluidSynth's driver sets the session to `.playback` mixed with others whenever it opens. The plugin sets its policy again once the driver is open. With `manual`, set your own session again after `start` returns.
-- An app that records, such as one that listens to the microphone, leaves the session in a record category. `start` moves it to playback, so set the record category again before you record.
+- `start` sets the audio session as `session` says. `AudioSessionPolicy.playback`, the default, is `.playback` without mixing, so other apps' audio stops and the ring switch does not mute the synth. `playbackMixing` mixes with other apps. `playAndRecord` plays while the app records. `manual` leaves the session to the app.
+- FluidSynth's driver sets the session whenever it opens, to `.playback` mixed with others. The plugin sets its policy again once the driver is open. With `manual`, set your own session again after `start` returns.
+- An app that records, such as one that listens to the microphone, leaves the session in a record category. `playback` and `playbackMixing` move it to playback, so set the record category again before you record.
+- To play while recording, set `.playAndRecord` for the recording and open the synth with `AudioSessionPolicy.playAndRecord`. The driver then opens in its low-latency mode, the one in which it asks for `.playAndRecord`, so the input stays open. The driver still sets its own mode, options and IO buffer duration as it opens, and the plugin then sets back the recording's, so a recording in `.measurement` mode stays in it. Until a recording has set `.playAndRecord`, the plugin sets it in mode `.default`, out of the speaker and to Bluetooth headphones through A2DP.
 - After an interruption ends or the media services reset, a started synth opens its output again by itself.
 
 ### Android
@@ -83,6 +84,6 @@ The plugin ships the official FluidSynth 2.6.2 release binaries, unmodified apar
 
 The plugin's own code is MIT. FluidSynth and libsndfile are under the GNU Lesser General Public License 2.1 or later, and the other bundled libraries are under Apache-2.0 and BSD-3-Clause. `LICENSE` holds every text.
 
-FluidSynth is linked dynamically on both platforms, as a shared library on Android and as a dynamic framework on iOS. Its source is at https://github.com/FluidSynth/fluidsynth, tag `v2.6.2`. An app that ships this plugin should name FluidSynth and its licence in its own licence notices. On Flutter, `LicenseRegistry` is one place to do that.
+FluidSynth is linked dynamically on both platforms, as a shared library on Android and as a dynamic framework on iOS. Its source is at https://github.com/FluidSynth/fluidsynth, tag `v2.6.2`. An app that ships this plugin should name FluidSynth and its licence in its own licence notices. A Flutter app does that without any code of its own: `LICENSE` is in the format Flutter's tool reads, parts split by a line of 80 hyphens, each opening with the names it covers, so the app's licence page lists `khuur_synth`, `fluidsynth`, `libsndfile`, `oboe`, `libogg`, `libvorbis`, `flac` and `opus`, each with its licence. `test/license_test.dart` reads the file the way the tool does.
 
 This is not legal advice.
