@@ -122,11 +122,11 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 
 1. Set the new `version` in `pubspec.yaml`, and give `CHANGELOG.md` an entry for it. The pubspec is the only place the plugin's version is written.
 2. Merge to `main`.
-3. Publish.
-   - Version 0.1.0 is published by hand, since pub.dev takes a new package only from a person. Run `flutter pub publish` from a clean checkout of `main`.
-   - Once automated publishing is on, as the header of `.github/workflows/publish.yml` describes, push a tag that matches the version, and the workflow publishes it.
+3. Push a tag that matches the version. `.github/workflows/publish.yml` runs the tests and publishes it to pub.dev through automated publishing, so nobody runs `flutter pub publish` by hand.
 
-     ```bash
-     git tag v0.2.0
-     git push origin v0.2.0
-     ```
+   ```bash
+   git tag v0.2.0
+   git push origin v0.2.0
+   ```
+
+   The header of `publish.yml` lists the settings on pub.dev and GitHub that this needs. A tag whose version differs from the pubspec's is refused by pub.dev.

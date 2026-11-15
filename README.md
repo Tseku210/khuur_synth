@@ -1,5 +1,7 @@
 # khuur_synth
 
+[![pub package](https://img.shields.io/pub/v/khuur_synth.svg)](https://pub.dev/packages/khuur_synth)
+
 Plays SoundFonts on iOS and Android with [FluidSynth](https://www.fluidsynth.org) 2.6.2, called from Dart through `dart:ffi`.
 
 A `Synth` is one FluidSynth synthesizer with 256 MIDI channels. It loads SF2 files from assets or from disk, plays notes on any channel with any preset, can detune each note by cents, and sounds through the device or renders samples without it. The same synth sounds the same on both platforms, because both run FluidSynth.

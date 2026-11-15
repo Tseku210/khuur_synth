@@ -2,17 +2,16 @@
 # pub.dev's automated publishing through GitHub's OIDC token. No secret is
 # stored in the repository.
 #
-# This workflow does nothing until it is turned on. To turn it on:
+# It relies on these settings, all of which are on:
 #
-# 1. Publish the first version by hand with `flutter pub publish`. pub.dev
-#    takes a new package only from a person.
-# 2. On https://pub.dev/packages/khuur_synth/admin, under Automated
-#    publishing, enable publishing from GitHub Actions with the repository
-#    Tseku210/khuur_synth and the tag pattern v{{version}}. Requiring the
-#    GitHub environment pub.dev there as well limits publishing to this job.
-# 3. In the repository's Settings, under Secrets and variables, then Actions,
-#    then Variables, add the variable PUB_AUTOMATED_PUBLISHING with the value
-#    true.
+# - On https://pub.dev/packages/khuur_synth/admin, under Automated
+#   publishing, publishing from GitHub Actions is enabled for the repository
+#   Tseku210/khuur_synth with the tag pattern v{{version}}, and requires the
+#   GitHub environment pub.dev.
+# - The repository has the environment pub.dev, which only tags matching v*
+#   may deploy from.
+# - The repository variable PUB_AUTOMATED_PUBLISHING is true. Setting it to
+#   anything else turns this workflow off.
 #
 # Then each release is a version bump and a CHANGELOG entry merged to main,
 # followed by a tag that matches the pubspec's version.
