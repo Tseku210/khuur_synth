@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:khuur_synth/khuur_synth.dart';
@@ -13,7 +14,9 @@ final class FakeEngine implements Engine {
 
   /// While set, a load waits for it.
   Completer<void>? loadGate;
-  Object? openError;
+
+  /// What the next opens throw, one each, in order. An open with none left opens.
+  final openErrors = Queue<Object>();
   var voices = 0;
   var _nextId = 1;
 
@@ -30,7 +33,7 @@ final class FakeEngine implements Engine {
   @override
   Future<void> openAudio() async {
     log.add('openAudio');
-    if (openError case final error?) throw error;
+    if (openErrors.isNotEmpty) throw openErrors.removeFirst();
   }
 
   @override

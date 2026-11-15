@@ -129,9 +129,8 @@ void main() {
     });
 
     test('a start that fails throws and can be tried again', () async {
-      engine.openError = const AudioOutputFailed('busy');
+      engine.openErrors.add(const AudioOutputFailed('busy'));
       await expectLater(synth.start(), throwsA(isA<AudioOutputFailed>()));
-      engine.openError = null;
       await synth.start();
       expect(log.where((l) => l == 'openAudio'), hasLength(2));
     });
