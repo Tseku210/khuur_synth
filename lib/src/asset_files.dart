@@ -9,14 +9,19 @@ import 'package:path_provider/path_provider.dart';
 /// directory, through a `.part` file and a rename, so a crash never leaves half
 /// a file and an app update never loads an old copy.
 final class AssetFiles {
+  /// Reads from the given bundle, or the root bundle, and copies into the
+  /// given directory, or the temporary directory.
   AssetFiles({this._bundle, this._directory = getTemporaryDirectory});
 
+  /// The copies every synth of the process shares.
   static final shared = AssetFiles();
 
   final AssetBundle? _bundle;
   final Future<Directory> Function() _directory;
   final _paths = <String, Future<String>>{};
 
+  /// The path of the copy of the asset [key], made on the first call.
+  ///
   /// A copy that fails is tried again on the next call.
   Future<String> pathOf(String key) async {
     final copy = _paths[key] ??= _copy(key);

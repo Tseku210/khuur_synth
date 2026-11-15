@@ -44,9 +44,11 @@ abstract interface class AudioSession {
   Stream<void> get resets;
 }
 
+/// The session through the plugin's iOS side. It does nothing on Android.
 final class PlatformAudioSession implements AudioSession {
   PlatformAudioSession._();
 
+  /// The one session of the process.
   static final instance = PlatformAudioSession._();
 
   static const _methods = MethodChannel('khuur_synth/session');
@@ -68,7 +70,9 @@ final class PlatformAudioSession implements AudioSession {
       : const Stream<void>.empty();
 }
 
+/// A session that does nothing, for tests and for `Synth.silent`.
 final class NoAudioSession implements AudioSession {
+  /// A session that does nothing.
   const NoAudioSession();
 
   @override

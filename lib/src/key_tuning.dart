@@ -5,6 +5,9 @@
 final class KeyTuning {
   final _channels = <int, Map<int, double>>{};
 
+  /// Records that [key] on [channel] is about to sound at [cents]. Answers
+  /// whether the key must be retuned first, and whether the channel's tuning
+  /// must be activated because this is its first detuned note.
   ({bool retune, bool activate}) prepare(int channel, int key, double cents) {
     final keys = _channels[channel];
     if (keys == null) {

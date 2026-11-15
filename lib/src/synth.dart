@@ -30,6 +30,7 @@ final class Synth {
       ..setGain(_gain);
   }
 
+  /// How many MIDI channels a synth has, numbered from 0.
   static const channelCount = 256;
 
   /// A synth with FluidSynth's own sound: its reverb, its chorus and a gain
@@ -171,6 +172,7 @@ final class Synth {
     });
   }
 
+  /// Releases [key], which then fades as its release says.
   void noteOff({required int channel, required int key}) {
     _checkOpen();
     _checkChannel(channel);
@@ -212,6 +214,7 @@ final class Synth {
     });
   }
 
+  /// Whether the chorus is on.
   bool get chorus => _chorus;
 
   set chorus(bool value) {
@@ -474,6 +477,8 @@ final class LoadedSoundFont {
 
   final Synth _owner;
   final int _id;
+
+  /// Where the SoundFont was loaded from.
   final SoundFont source;
 
   /// Every preset in the file, in the order FluidSynth lists them.

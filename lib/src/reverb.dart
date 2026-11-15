@@ -2,6 +2,7 @@
 ///
 /// `Reverb()` is FluidSynth's default sound.
 final class Reverb {
+  /// A reverb with FluidSynth's defaults for any value not given.
   const Reverb({this.roomSize = 0.2, this.damping = 0, this.width = 0.5, this.level = 0.9});
 
   /// From 0 to 1. Near 1 the tail barely decays.
