@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:khuur_synth/khuur_synth.dart';
 
 void main() => runApp(const MaterialApp(home: PianoPage()));
