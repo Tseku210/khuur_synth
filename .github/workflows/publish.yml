@@ -1,0 +1,46 @@
+# Publishes khuur_synth to pub.dev when a tag such as v0.2.0 is pushed, with
+# pub.dev's automated publishing through GitHub's OIDC token. No secret is
+# stored in the repository.
+#
+# This workflow does nothing until it is turned on. To turn it on:
+#
+# 1. Publish the first version by hand with `flutter pub publish`. pub.dev
+#    takes a new package only from a person.
+# 2. On https://pub.dev/packages/khuur_synth/admin, under Automated
+#    publishing, enable publishing from GitHub Actions with the repository
+#    Tseku210/khuur_synth and the tag pattern v{{version}}. Requiring the
+#    GitHub environment pub.dev there as well limits publishing to this job.
+# 3. In the repository's Settings, under Secrets and variables, then Actions,
+#    then Variables, add the variable PUB_AUTOMATED_PUBLISHING with the value
+#    true.
+#
+# Then each release is a version bump and a CHANGELOG entry merged to main,
+# followed by a tag that matches the pubspec's version.
+#
+#   git tag v0.2.0
+#   git push origin v0.2.0
+
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish:
+    if: vars.PUB_AUTOMATED_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    environment: pub.dev
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      # Sets up the OIDC token that pub.dev accepts.
+      - uses: dart-lang/setup-dart@v1
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter pub publish --force
