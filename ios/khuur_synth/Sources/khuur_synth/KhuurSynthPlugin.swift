@@ -33,8 +33,9 @@ public final class KhuurSynthPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     }
   }
 
-  /// The `.playAndRecord` session that `playAndRecord` holds, and the IO
-  /// buffer duration the recording asked for.
+  /// The last `.playAndRecord` session found that FluidSynth's driver did not
+  /// set, and its IO buffer duration. That is the recording's session, or the
+  /// plugin's own `.speaker` one when no recording has set one.
   private var held: (recording: Recording, ioBufferDuration: TimeInterval)?
 
   /// Keeps the `.playAndRecord` session a recording set, or sets one out of

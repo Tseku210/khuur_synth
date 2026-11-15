@@ -61,6 +61,8 @@ final class FluidEngine implements Engine {
     return FluidEngine._(settings, synth);
   }
 
+  /// FluidSynth's `fluid_settings_t` is its hashtable type under another
+  /// name, so ffigen names it `fluid_hashtable_t`.
   final Pointer<fluid_hashtable_t> _settings;
   final Pointer<fluid_synth_t> _synth;
   var _driver = 0;

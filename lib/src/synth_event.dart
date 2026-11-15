@@ -4,6 +4,10 @@ import 'sound_font.dart';
 /// What a synth from `Synth.silent` did, one event for each call it carried
 /// out, in the order it carried them out.
 ///
+/// A call that changed nothing, such as a `start` while started, and a call
+/// that threw report nothing. The notes a `stop` releases or cuts are not
+/// reported apart from its [Stopped].
+///
 /// The subclasses are exported by `package:khuur_synth/testing.dart`.
 sealed class SynthEvent {
   /// Lets the subclasses be constant.
