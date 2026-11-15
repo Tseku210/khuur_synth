@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -22,15 +23,20 @@ final class AssetFiles {
 
   /// The path of the copy of the asset [key], made on the first call.
   ///
-  /// A copy that fails is tried again on the next call.
+  /// A copy that fails is tried again on the next call, and so is a copy that
+  /// the OS has deleted since, as it may when it clears the temporary folder.
   Future<String> pathOf(String key) async {
     final copy = _paths[key] ??= _copy(key);
+    final String path;
     try {
-      return await copy;
+      path = await copy;
     } catch (_) {
       if (identical(_paths[key], copy)) _paths.remove(key)?.ignore();
       rethrow;
     }
+    if (await File(path).exists()) return path;
+    if (identical(_paths[key], copy)) unawaited(_paths.remove(key));
+    return pathOf(key);
   }
 
   Future<String> _copy(String key) async {
