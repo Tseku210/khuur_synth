@@ -1,5 +1,4 @@
 group = "mn.morinkhugur.khuur_synth"
-version = "0.1.0"
 
 plugins {
     id("com.android.library")
