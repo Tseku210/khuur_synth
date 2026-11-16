@@ -19,8 +19,8 @@
 ///
 /// [Synth.open] throws [SynthUnavailable] on macOS, Windows and Linux,
 /// including in `flutter test` on a host machine. Tests use [Synth.silent],
-/// whose events are in `package:khuur_synth/testing.dart`. The package does
-/// not compile for the web, since it uses `dart:ffi`.
+/// whose events are in `package:khuur_synth/testing.dart`. On the web the
+/// package compiles, and [Synth.open] throws [SynthUnavailable] there too.
 library;
 
 export 'src/audio_session.dart' show AudioSessionPolicy;

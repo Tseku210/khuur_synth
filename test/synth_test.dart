@@ -1,3 +1,6 @@
+@TestOn('vm')
+library;
+
 import 'dart:async';
 
 import 'package:fake_async/fake_async.dart';
@@ -221,6 +224,11 @@ void main() {
   });
 
   test('Synth.open says FluidSynth is unavailable on a host', () {
-    expect(Synth.open(), throwsA(isA<SynthUnavailable>()));
+    expect(
+      Synth.open(),
+      throwsA(
+        isA<SynthUnavailable>().having((e) => e.message, 'message', 'khuur_synth plays on iOS and Android only.'),
+      ),
+    );
   });
 }
