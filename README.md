@@ -16,7 +16,7 @@ The plugin bundles FluidSynth's official release binaries, so an app never build
 | Android | API 24 (Android 7.0) or later | This is Flutter's default `minSdk`, so an app made with `flutter create` needs no change. |
 | Flutter | 3.47 or later | |
 
-Only iOS and Android are supported. On macOS, Windows and Linux, which includes `flutter test` on a host machine, the package compiles and `Synth.open` throws `SynthUnavailable`. Tests use `Synth.silent` instead, as [Test code that plays](#test-code-that-plays) shows. On the web the package does not compile, because it uses `dart:ffi`.
+Only iOS and Android are supported. On macOS, Windows and Linux, which includes `flutter test` on a host machine, the package compiles and `Synth.open` throws `SynthUnavailable`. Tests use `Synth.silent` instead, as [Test code that plays](#test-code-that-plays) shows. On the web the package compiles with both web compilers, and `Synth.open` throws `SynthUnavailable`, so an app that plays on mobile still builds for the web.
 
 ## Quick start
 

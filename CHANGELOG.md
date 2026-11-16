@@ -1,3 +1,7 @@
+## 0.1.1
+
+- The package compiles for the web, with dart2js and dart2wasm. There `Synth.open` throws `SynthUnavailable` with the message "khuur_synth does not run on the web.", and `Synth.silent` works as on a host machine. Before, an app that depended on khuur_synth failed `flutter build web`, because the package imported `dart:ffi` on every platform.
+
 ## 0.1.0
 
 First release.

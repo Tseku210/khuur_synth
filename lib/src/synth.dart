@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'audio_session.dart';
 import 'engine.dart';
-import 'fluid/fluid_engine.dart';
+import 'fluid/no_fluid_engine.dart' if (dart.library.ffi) 'fluid/fluid_engine.dart';
 import 'key_tuning.dart';
 import 'reverb.dart';
 import 'sound_font.dart';
