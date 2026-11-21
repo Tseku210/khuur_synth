@@ -34,6 +34,7 @@ functions:
     - fluid_synth_unset_program
     - fluid_synth_noteon
     - fluid_synth_noteoff
+    - fluid_synth_cc
     - fluid_synth_all_notes_off
     - fluid_synth_all_sounds_off
     - fluid_synth_set_gain

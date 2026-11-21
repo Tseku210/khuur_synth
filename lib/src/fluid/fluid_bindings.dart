@@ -118,6 +118,16 @@ class FluidSynthBindings {
   late final _fluid_synth_noteoff = _fluid_synth_noteoffPtr
       .asFunction<int Function(ffi.Pointer<fluid_synth_t>, int, int)>();
 
+  int fluid_synth_cc(ffi.Pointer<fluid_synth_t> synth, int chan, int ctrl, int val) {
+    return _fluid_synth_cc(synth, chan, ctrl, val);
+  }
+
+  late final _fluid_synth_ccPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<fluid_synth_t>, ffi.Int, ffi.Int, ffi.Int)>>(
+        'fluid_synth_cc',
+      );
+  late final _fluid_synth_cc = _fluid_synth_ccPtr.asFunction<int Function(ffi.Pointer<fluid_synth_t>, int, int, int)>();
+
   int fluid_synth_program_select(
     ffi.Pointer<fluid_synth_t> synth,
     int chan,
