@@ -194,8 +194,9 @@ final class Synth {
   /// resets the controllers, such as 123 or 121, reports no event of its own.
   /// Three kinds change what other calls do. While the sustain pedal, 64, is
   /// down, released notes keep sounding, so `stop(ringOut: true)` waits its
-  /// full ten seconds. The mode messages 124 to 127 on channel 0 can mute
-  /// channels 1 to 255. Selecting a tuning program through registered
+  /// full ten seconds. Omni off, 124, on channel 0 mutes channels 1 to 255
+  /// until omni on, 125, restores them, and mono on, 126, makes channels
+  /// monophonic. Selecting a tuning program through registered
   /// parameters 101, 100 and 6 makes later `cents` on that channel ignored.
   void controlChange({required int channel, required int controller, required int value}) {
     _checkOpen();
