@@ -39,6 +39,9 @@ abstract interface class Engine {
   /// Releases [key] on [channel].
   void noteOff(int channel, int key);
 
+  /// Sets [controller] of [channel] to [value].
+  void controlChange(int channel, int controller, int value);
+
   /// Releases every note.
   void allNotesOff();
 
@@ -101,6 +104,9 @@ final class NoEngine implements Engine {
 
   @override
   void noteOff(int channel, int key) {}
+
+  @override
+  void controlChange(int channel, int controller, int value) {}
 
   @override
   void allNotesOff() {}

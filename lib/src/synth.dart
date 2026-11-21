@@ -186,6 +186,23 @@ final class Synth {
     });
   }
 
+  /// Sets MIDI [controller], from 0 to 127, of [channel] to [value], from 0
+  /// to 127, as a MIDI control change does. The notes already sounding follow
+  /// it, so controller 11, expression, swells or fades a held note.
+  ///
+  /// The controller goes to FluidSynth as it is, so one that ends notes or
+  /// resets the controllers, such as 123 or 121, reports no event of its own.
+  void controlChange({required int channel, required int controller, required int value}) {
+    _checkOpen();
+    _checkChannel(channel);
+    RangeError.checkValueInInterval(controller, 0, 127, 'controller');
+    RangeError.checkValueInInterval(value, 0, 127, 'value');
+    _command(() {
+      _engine.controlChange(channel, controller, value);
+      _emit(ControlChanged(channel: channel, controller: controller, value: value));
+    });
+  }
+
   /// Releases every note, which then fades as its release says.
   void allNotesOff() {
     _checkOpen();

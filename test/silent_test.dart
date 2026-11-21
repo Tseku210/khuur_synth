@@ -11,6 +11,7 @@ void main() {
     final font = await synth.load(source);
     synth.select(channel: 0, font: font, program: 0);
     synth.noteOn(channel: 0, key: 64, velocity: 90, cents: -13.7);
+    synth.controlChange(channel: 0, controller: 11, value: 40);
     synth.noteOff(channel: 0, key: 64);
     synth.allNotesOff();
     synth.allSoundsOff();
@@ -27,6 +28,7 @@ void main() {
       const Loaded(source),
       const Selected(channel: 0, source: source, bank: 0, program: 0),
       const NoteOn(channel: 0, key: 64, velocity: 90, cents: -13.7),
+      const ControlChanged(channel: 0, controller: 11, value: 40),
       const NoteOff(channel: 0, key: 64),
       const AllNotesOff(),
       const AllSoundsOff(),

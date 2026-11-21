@@ -26,6 +26,16 @@ void main() {
     expect(1200 * log(lowered / plain) / ln2, closeTo(-13.7, 1));
   });
 
+  test('expression turns a held note down and up again without striking it', () async {
+    final swelled = await _rmsAfterEachExpression([127, 40, 127]);
+    final held = await _rmsAfterEachExpression([127, 127, 127]);
+    final levels = 'swelled $swelled, held $held';
+    expect(held[1], greaterThan(held[0] * 0.7), reason: levels);
+    expect(swelled[1], lessThan(swelled[0] * 0.5), reason: levels);
+    expect(swelled[2], greaterThan(swelled[1] * 2), reason: levels);
+    expect(swelled[2], closeTo(held[2], held[2] * 0.1), reason: levels);
+  });
+
   test('a note sounds through the device and rings out', () async {
     final synth = await Synth.open();
     synth.select(channel: 0, font: await synth.load(piano), program: 0);
@@ -83,6 +93,21 @@ Future<double> _pitch(int key, double cents) async {
   final samples = await synth.render(32768);
   await synth.close();
   return _peak(samples, 440 * pow(2, (key - 69) / 12).toDouble());
+}
+
+Future<List<double>> _rmsAfterEachExpression(List<int> expressions) async {
+  final synth = await Synth.open(reverb: null, chorus: false);
+  synth.select(channel: 0, font: await synth.load(piano), program: 0);
+  synth.noteOn(channel: 0, key: 60, velocity: 100);
+  await synth.render(4410);
+  final levels = <double>[];
+  for (final value in expressions) {
+    synth.controlChange(channel: 0, controller: 11, value: value);
+    final samples = await synth.render(4410);
+    levels.add(sqrt(samples.fold(0.0, (sum, x) => sum + x * x) / samples.length));
+  }
+  await synth.close();
+  return levels;
 }
 
 double _peak(Float32List stereo, double near) {

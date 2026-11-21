@@ -61,6 +61,9 @@ final class FakeEngine implements Engine {
   void noteOff(int channel, int key) => log.add('noteOff $channel $key');
 
   @override
+  void controlChange(int channel, int controller, int value) => log.add('controlChange $channel $controller $value');
+
+  @override
   void allNotesOff() => log.add('allNotesOff');
 
   @override

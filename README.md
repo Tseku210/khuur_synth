@@ -76,10 +76,11 @@ A synth goes through the same steps in every app.
 - `load(source)` reads an `AssetSoundFont(key)` or a `FileSoundFont(path)` and answers a `LoadedSoundFont` with its `presets`. `unload(font)` frees it and silences the channels that played from it.
 - `select(channel:, font:, program:, bank:)` sets what a channel plays. A preset the file lacks throws `PresetNotFound`.
 - `noteOn(channel:, key:, velocity:, cents:)`, `noteOff`, `allNotesOff` and `allSoundsOff` play.
+- `controlChange(channel:, controller:, value:)` sets a MIDI controller of a channel, as `fluid_synth_cc` does. The notes already sounding follow it, so controller 11, expression, swells or fades a held note without striking it again.
 - `render(frames)` answers interleaved stereo float samples at 44.1 kHz while the synth is stopped, for tests and bounces.
 - `Synth.silent()` runs every rule of a real synth and makes no sound. Its `onEvent` hears each call as a `SynthEvent`.
 
-Channels run from 0 to 255, keys and programs from 0 to 127, velocities from 1 to 127, and banks from 0 to 16383. Bank 128 holds the drum kits in a General MIDI SoundFont.
+Channels run from 0 to 255, keys, programs, controllers and controller values from 0 to 127, velocities from 1 to 127, and banks from 0 to 16383. Bank 128 holds the drum kits in a General MIDI SoundFont.
 
 Errors are the sealed `SynthException`, which is one of `SynthUnavailable`, `SoundFontLoadFailed`, `PresetNotFound` and `AudioOutputFailed`. These come from the device or the file, so an app should catch them.
 

@@ -168,6 +168,10 @@ final class FluidEngine implements Engine {
   void noteOff(int channel, int key) => _fluid.fluid_synth_noteoff(_synth, channel, key);
 
   @override
+  void controlChange(int channel, int controller, int value) =>
+      _fluid.fluid_synth_cc(_synth, channel, controller, value);
+
+  @override
   void allNotesOff() => _fluid.fluid_synth_all_notes_off(_synth, -1);
 
   @override
