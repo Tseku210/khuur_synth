@@ -192,6 +192,11 @@ final class Synth {
   ///
   /// The controller goes to FluidSynth as it is, so one that ends notes or
   /// resets the controllers, such as 123 or 121, reports no event of its own.
+  /// Three kinds change what other calls do. While the sustain pedal, 64, is
+  /// down, released notes keep sounding, so `stop(ringOut: true)` waits its
+  /// full ten seconds. The mode messages 124 to 127 on channel 0 can mute
+  /// channels 1 to 255. Selecting a tuning program through registered
+  /// parameters 101, 100 and 6 makes later `cents` on that channel ignored.
   void controlChange({required int channel, required int controller, required int value}) {
     _checkOpen();
     _checkChannel(channel);

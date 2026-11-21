@@ -1,6 +1,6 @@
 name: khuur_synth
 description: Plays SoundFonts on iOS and Android through FluidSynth, with cents on every note, reverb, chorus and offline rendering.
-version: 0.1.1
+version: 0.2.0
 repository: https://github.com/Tseku210/khuur_synth
 issue_tracker: https://github.com/Tseku210/khuur_synth/issues
 
