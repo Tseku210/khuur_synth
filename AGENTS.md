@@ -9,7 +9,8 @@ khuur_synth is a Flutter plugin that plays SF2 SoundFonts on iOS and Android thr
 - A synth's life runs `open`, then `load`, then `select`, then `start`, then `noteOn` and `noteOff`, then `stop`, then `close`. `start` and `stop` may repeat. Nothing sounds without `start`, and a channel with no `select` plays nothing.
 - Declare each SoundFont asset in the app's `pubspec.yaml` and load it with `AssetSoundFont('assets/name.sf2')`. Use `FileSoundFont(path)` for a downloaded file. iOS reads SF2 only, not SF3.
 - Give each instrument its own channel. A channel plays one preset at a time.
-- Ranges are checked at the call and throw `RangeError`, or fail the future of an asynchronous call. Channels run 0 to 255, keys and programs 0 to 127, velocity 1 to 127, banks 0 to 16383, `cents` -1200 to 1200, `gain` 0 to 10.
+- `controlChange(channel:, controller:, value:)` sends a MIDI controller, such as 11 for expression or 64 for the sustain pedal. Notes already sounding follow it.
+- Ranges are checked at the call and throw `RangeError`, or fail the future of an asynchronous call. Channels run 0 to 255, keys, programs, controllers and controller values 0 to 127, velocity 1 to 127, banks 0 to 16383, `cents` -1200 to 1200, `gain` 0 to 10.
 - `load`, `unload`, `start`, `stop`, `render` and `close` return futures, so await them. Notes and setters are synchronous and need no await, even right after an unawaited `start`, since every call runs in the order it was made.
 - Errors to catch are the sealed `SynthException`, which is one of `SynthUnavailable`, `SoundFontLoadFailed`, `PresetNotFound` and `AudioOutputFailed`.
 - An app that also records on iOS, such as a tuner, opens the synth with `session: AudioSessionPolicy.playAndRecord`.

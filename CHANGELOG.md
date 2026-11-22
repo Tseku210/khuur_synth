@@ -1,3 +1,8 @@
+## 0.2.0
+
+- `Synth.controlChange(channel:, controller:, value:)` sends a MIDI control change to a channel, as `fluid_synth_cc` does. The notes already sounding follow it, so controller 11, expression, swells or fades a held note without striking it again. `Synth.silent` reports it as `ControlChanged`.
+- **Breaking:** `ControlChanged` is a new `SynthEvent`. A `switch` over every `SynthEvent` needs a case for it.
+
 ## 0.1.1
 
 - The package compiles for the web, with dart2js and dart2wasm. There `Synth.open` throws `SynthUnavailable` with the message "khuur_synth does not run on the web.", and `Synth.silent` works as on a host machine. Before, an app that depended on khuur_synth failed `flutter build web`, because the package imported `dart:ffi` on every platform.

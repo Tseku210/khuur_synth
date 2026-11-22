@@ -46,6 +46,17 @@ void main() {
       expect(log, ['noteOn 0 60 100', 'load $piano', 'noteOn 0 64 100', 'allNotesOff']);
     });
 
+    test('a control change made while a load runs reaches the engine after it, between the notes', () async {
+      engine.loadGate = Completer();
+      synth.noteOn(channel: 2, key: 60);
+      final loading = synth.load(piano);
+      synth.controlChange(channel: 2, controller: 11, value: 40);
+      synth.noteOff(channel: 2, key: 60);
+      engine.loadGate!.complete();
+      await loading;
+      expect(log, ['noteOn 2 60 100', 'load $piano', 'controlChange 2 11 40', 'noteOff 2 60']);
+    });
+
     test('a call made after a wait runs after it and before the next one', () async {
       engine.loadGate = Completer();
       unawaited(synth.load(piano));
@@ -220,6 +231,11 @@ void main() {
     expect(() => synth.noteOn(channel: 0, key: 60, cents: double.nan), throwsRangeError);
     expect(() => synth.gain = 11, throwsRangeError);
     expect(() => synth.reverb = const Reverb(roomSize: 2), throwsRangeError);
+    expect(() => synth.controlChange(channel: 256, controller: 11, value: 0), throwsRangeError);
+    expect(() => synth.controlChange(channel: 0, controller: 128, value: 0), throwsRangeError);
+    expect(() => synth.controlChange(channel: 0, controller: -1, value: 0), throwsRangeError);
+    expect(() => synth.controlChange(channel: 0, controller: 11, value: 128), throwsRangeError);
+    expect(() => synth.controlChange(channel: 0, controller: 11, value: -1), throwsRangeError);
     expect(log, isEmpty);
   });
 

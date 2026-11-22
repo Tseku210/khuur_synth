@@ -135,6 +135,31 @@ final class NoteOff extends SynthEvent {
   String toString() => 'NoteOff(channel: $channel, key: $key)';
 }
 
+/// A channel's MIDI controller was set.
+final class ControlChanged extends SynthEvent {
+  /// [controller] of [channel] was set to [value].
+  const ControlChanged({required this.channel, required this.controller, required this.value});
+
+  /// The channel, from 0 to 255.
+  final int channel;
+
+  /// The MIDI controller, from 0 to 127.
+  final int controller;
+
+  /// From 0 to 127.
+  final int value;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ControlChanged && other.channel == channel && other.controller == controller && other.value == value;
+
+  @override
+  int get hashCode => Object.hash(ControlChanged, channel, controller, value);
+
+  @override
+  String toString() => 'ControlChanged(channel: $channel, controller: $controller, value: $value)';
+}
+
 /// Every note was released.
 final class AllNotesOff extends SynthEvent {
   /// Every note was released.
